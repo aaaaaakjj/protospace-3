@@ -22,10 +22,16 @@ class PrototypesController < ApplicationController
 
   def show
     @prototype = Prototype.find(params[:id])
+    @comment = Comment.new
+    @comments = @prototype.comments.includes(:user)
   end
 
   def edit
     @prototype = Prototype.find(params[:id])
+     # 編集しようとしているプロトタイプの所有者が現在のユーザーでない場合
+     if @prototype.user != current_user
+      redirect_to root_path, alert: '他のユーザーのプロトタイプは編集できません。'
+    end
   end
   
   def update
@@ -48,5 +54,4 @@ class PrototypesController < ApplicationController
   def prototype_params
     params.require(:prototype).permit(:title, :catch_copy, :concept, :image).merge(user_id: current_user.id)
   end
-  
 end
